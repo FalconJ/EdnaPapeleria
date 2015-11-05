@@ -126,8 +126,89 @@ public class cart {
         conn = new DB_Conn().getConnection();
         Statement st = conn.createStatement();
         
-        for(int i=0; id.size(); i++){
-            String
+        for(int i=0; i<id.size(); i++){
+            String getPrices = "SELECT 'price' FROM 'products' WHERE 'product_id'=" + id.get(i).toString() + ";";
+            
+            ResultSet rs = st.executeQuery(getPrices);
+            rs.next();
+            
+            double f = rs.getFloat("price");
+            f *= qty.get(i);
+            tPrices.add(f);
         }
+        
+        double sum = 0;
+        for(int i=0; i<tPrices.size(); i++){
+            sum +=  tPrices.get(i);
+        }
+        
+        return sum;
+    }
+    
+    public ArrayList<Integer> getQty(){
+        return qty;
+    }
+    
+    public ArrayList<Integer> getId(){
+        return id;
+    }
+    
+    public boolean addProduct(int id) throws SQLException, ClassNotFoundException{
+    //Step 1 : check for ids in DATABASE
+    //Step 2 : Match the given id with database
+    //          Matched -> break and mtches = 1
+    //STEP 3 : if arraylist contains the same id Do not insert
+    //          increment the qty, else insert into id & qty
+  
+        boolean added  = false; 
+        boolean matches = false;
+        
+        conn = new DB_Conn().getConnection();
+        Statement st = conn.createStatement();
+        
+        String getValidIds = "SELECT 'product_id' FROM 'products'";
+        ResultSet rs = st.executeQuery(getValidIds);
+        
+        while(rs.next()){
+            int idProd = rs.getInt("product_id");
+            if(idProd == id){
+                matches = true;
+                break;
+            }  
+        }
+        
+        if(matches == true){
+            if(this.id.contains(id)){
+                int index = this.id.indexOf(id);
+                this.qty.set(index, this.qty.get(index) + 1);
+            }
+            else{
+                this.qty.add(1);
+                this.id.add(id);
+            }
+            added = true;
+        }
+        
+        return added;
+    }
+    
+    public boolean removedProduct(int productId){
+        boolean removed = false;
+        
+        if(this.id.contains(productId)){
+            int index = this.id.indexOf(productId);
+            int quantity = this.qty.get(index);
+            
+            //remove
+            this.productCategory.remove(index);
+            this.productName.remove(index);
+            this.prices.remove(index);
+            this.qty.remove(index);
+            this.id.remove(index);
+            
+            removed = true;
+        }
+        
+        return removed;
     }
 }

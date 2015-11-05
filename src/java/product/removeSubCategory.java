@@ -25,19 +25,20 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author User
  */
-public class removeCompany extends HttpServlet{
+public class removeSubCategory extends HttpServlet{
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
+        
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet removeCompany</title>");            
+            out.println("<title>Servlet removeSubCategory</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet removeCompany at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet removeSubCategory at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -73,36 +74,36 @@ public class removeCompany extends HttpServlet{
         dispatchMessage = request.getServletContext().getRequestDispatcher(messageUrl);
     
         try{
-            ArrayList<Integer> company = new ArrayList<>();
-            company.clear();
+            ArrayList<Integer> category = new ArrayList<>();
+            category.clear();
             
             Connection con = new DB_Conn().getConnection();
             Statement st = con.createStatement();
-            PrintWriter out = response.getWriter();
             
+            PrintWriter out = response.getWriter();
             Enumeration<String> parameterNames = request.getParameterNames();
+            
             while(parameterNames.hasMoreElements()){
                 String[] parameterValues = request.getParameterValues(parameterNames.nextElement());
                 
                 if(parameterValues.length > 1){
-                    for (int i=0;i<parameterValues.length; i++){
+                    for(int i=0;i<parameterValues.length; i++){
                         out.println (" " + parameterValues[i]);
-                        company.add(Integer.parseInt(parameterValues[i]));
+                        category.add(Integer.parseInt(parameterValues[i]));
                     }
-                }
-                else {
-                    out.println (" " + parameterValues[0]);
-                    company.add(Integer.parseInt(parameterValues[0]));
+                }else {
+                    out.println (" "+parameterValues[0]);
+                    category.add(Integer.parseInt(parameterValues[0]));
                 }
             }
             
-            for(int i=0; i<company.size(); i++){
-                out.println("<br><br> " + company.get(i));
-                String deleteCompany = "DELETE FROM product_company " +
-                                       "WHERE company_id = '" + company.get(i) + "' ;";
-            
-                st.addBatch(deleteCompany);
+            for(int i=0; i<category.size(); i++){
+                out.println("<br><br> " + category.get(i));
+                String delCategory = "DELETE FROM sub_category " +
+                                     "WHERE subcategory_id = '" + category.get(i) + "' ;";
+                st.addBatch(delCategory);
             }
+            
             st.executeBatch();
             response.sendRedirect("/Papeleria/admin_settings.jsp");
         }
@@ -118,7 +119,7 @@ public class removeCompany extends HttpServlet{
             dispatchMessage.forward(request, response);
         }
     }
-
+    
     /**
      *
      * @return
