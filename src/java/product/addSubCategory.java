@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author User
  */
-public class addCategory extends HttpServlet{
-    
+public class addSubCategory extends HttpServlet{
+ 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -29,82 +29,68 @@ public class addCategory extends HttpServlet{
              */
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet addCategory</title>");            
+            out.println("<title>Servlet addSubCategory</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet addCategory at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet addSubCategory at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     }
     
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException{
-        processRequest(request, response);
-    }
-    
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException{
-        String categoryName = request.getParameter("categoryName");
+        throws ServletException, IOException{
         PrintWriter out = response.getWriter();
         
-        String message = addCategory(categoryName);
-        out.println(message);
+        String subCategoryName = request.getParameter("subCategoryName");
+        String categoryName = request.getParameter("categoryName");
+    
+        String message = addSubCategory(subCategoryName, categoryName);
+        out.print(message);
     }
     
-    private String addCategory(String categoryName){
+    private String addSubCategory(String subCategoryName, String categoryName){
         String message;
         
-        if(categoryName.equals("")){
-            message = "Please enter a category name";
+        if(subCategoryName.equals("")){
+            message = "Please enter a subcategory";
         }
         else{
             try{
                 DB_Conn conn = new DB_Conn();
-                Connection con;
-                con = conn.getConnection();
+                Connection con = conn.getConnection();
                 
-                String newCategory = "INSERT INTO 'Papeleria'.'category'" +
-                                     "('category_id', 'category_name') VALUES " +
-                                     "(NULL, '" + categoryName + "');";
+                String newSubCategory = "INSERT INTO 'Papeleria'.'sub_category' " +
+                                        "('subcategory_id', 'subcategory_name', 'category_name') " +
+                                        "VALUES(NULL, '" + subCategoryName + "', '" + categoryName + "');";
+            
                 Statement st = con.createStatement();
+                int i = st.executeUpdate(newSubCategory);
                 
-                int rows = st.executeUpdate(newCategory);
-                
-                if(rows == 1){
-                    message = categoryName + " category inserted";
+                if(i == 1){
+                    message = subCategoryName + " subcategory added";
                 }
                 else{
-                    message = "category insertion failed";
+                    message = "new subcategory failed";
                 }
                 
                 st.close();
                 con.close();
             }
-            catch(SQLSyntaxErrorException ex){
-                message = "Error" + ex.getMessage();
+            catch(SQLIntegrityConstraintViolationException ex){
+                message = "subcategory already exists";
             }
-            catch(SQLException | ClassNotFoundException ex){
-                message = "Error" + ex.getMessage();
+            catch(SQLSyntaxErrorException ex){
+                message = "Error in the query";
+            }
+            catch(SQLException ex){
+                message = "there was a problem in the connection";
+            }
+            catch(ClassNotFoundException ex){
+                message = "System cant find the class";
             }
         }
-        
         return message;
     }
     
