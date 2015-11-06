@@ -100,8 +100,44 @@
         
         <div class="container_16">
             <div id="contents">
-                
+<%
+    Connection c = new DB_Conn().getConnection();
+    Statement st = c.createStatement();
+    String getCategory = "SELECT * FROM category; ";
+    
+    ResultSet rs = st.executeQuery(getCategory);
+    
+%>
+                <div id="leftside" class="grid_3">
+                   <div>
+                       <ul id="leftsideNav">
+                           <li><a href="#"><strong>Categories</strong></a></li>
+
+                           <%
+                           while (rs.next()){
+                               String category = rs.getString ("category_name");
+                               %>
+                               <li><a href="viewProducts_.jsp"><%= category %></a></li>
+                           <%
+                           }
+                           %>
+
+                       </ul>
+                   </div>
+                   <div class="adv">
+                       <h2><br/>This is The Header of an Advertisement</h2>
+                       <p>We offer Advertisement display here </p>
+                   </div>
+               </div>
             </div>
+                           
+                <!-- Middle -->
+            <div id="middle"class="grid_13">
+                <jsp:include page="includesPage/mainHeaders/topMostViewedProducts_4.jsp"></jsp:include>
+            </div>
+
         </div>
+            
+        <jsp:include page="includesPage/_footer.jsp"></jsp:include>
     </body>
 </html>
